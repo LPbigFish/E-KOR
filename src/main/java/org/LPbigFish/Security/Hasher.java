@@ -1,28 +1,32 @@
 package org.LPbigFish.Security;
 import java.security.*;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Hasher {
 
-    public static byte[] toSha256(String input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(input.getBytes());
-            return md.digest();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static void init() {
+        Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static byte[] doubleSha256(String input) {
+    public static byte[] toKeccak512(String input) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance("SHA3-512", "BC");
+            digest.update(input.getBytes());
+            return digest.digest();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] doubleKeccak512(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA3-512", "BC");
             md.update(input.getBytes());
             byte[] digest = md.digest();
             md.update(digest);
-            digest = md.digest();
-            return digest;
-        } catch (NoSuchAlgorithmException e) {
+            md.update(input.getBytes());
+            return md.digest();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
