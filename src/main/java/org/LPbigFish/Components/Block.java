@@ -1,5 +1,9 @@
 package org.LPbigFish.Components;
 
+import org.LPbigFish.Security.Hasher;
+
+import java.util.Objects;
+
 public record Block(long index, long timestamp, String previousHash, String hash, String data, long nonce) {
 
     public Block(long index, long timestamp, String previousHash, String hash, String data, long nonce) {
@@ -19,12 +23,42 @@ public record Block(long index, long timestamp, String previousHash, String hash
         this.nonce = nonce;
     }
 
-    public Block getBlock() {
-        return this;
+    @Override
+    public long index() {
+        return index;
+    }
+
+    @Override
+    public long timestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public String previousHash() {
+        return previousHash;
+    }
+
+    @Override
+    public String hash() {
+        return hash;
+    }
+
+    @Override
+    public String data() {
+        return data;
+    }
+
+    @Override
+    public long nonce() {
+        return nonce;
     }
 
     public boolean isValid() {
-        return true;
+        return getBlockHash().equals(hash);
+    }
+
+    public String getBlockHash() {
+        return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak512(Hasher.toString(Hasher.toKeccak512(index + timestamp + previousHash + data)) + nonce)));
     }
 
 }
