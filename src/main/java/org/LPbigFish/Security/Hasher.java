@@ -1,6 +1,9 @@
 package org.LPbigFish.Security;
-import java.security.*;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import java.security.MessageDigest;
+import java.security.Security;
 
 public class Hasher {
 
@@ -38,6 +41,14 @@ public class Hasher {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    public static byte[] hashToByteArray(String input) {
+        byte[] bytes = new byte[input.length() / 2];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) Integer.parseInt(input.substring(2 * i, 2 * i + 2), 16);
+        }
+        return bytes;
     }
 
 }

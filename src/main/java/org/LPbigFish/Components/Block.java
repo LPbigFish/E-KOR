@@ -4,9 +4,9 @@ import org.LPbigFish.Security.Hasher;
 
 import java.util.Objects;
 
-public record Block(long index, long timestamp, String previousHash, String hash, String data, long nonce) {
+public record Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, long diff, long blockTime) {
 
-    public Block(long index, long timestamp, String previousHash, String hash, String data, long nonce) {
+    public Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, long diff, long blockTime) {
         this.index = Math.abs(index);
         this.timestamp = timestamp;
         if (previousHash.length() != 64) {
@@ -21,6 +21,8 @@ public record Block(long index, long timestamp, String previousHash, String hash
         }
         this.data = data;
         this.nonce = nonce;
+        this.diff = diff;
+        this.blockTime = blockTime;
     }
 
     @Override
@@ -53,12 +55,21 @@ public record Block(long index, long timestamp, String previousHash, String hash
         return nonce;
     }
 
+    @Override
+    public long diff() {
+        return diff;
+    }
+
     public boolean isValid() {
         return getBlockHash().equals(hash);
     }
 
     public String getBlockHash() {
         return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak512(Hasher.toString(Hasher.toKeccak512(index + timestamp + previousHash + data)) + nonce)));
+    }
+
+    public void printBlock() {
+
     }
 
 }
