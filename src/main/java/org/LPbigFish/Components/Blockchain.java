@@ -1,5 +1,7 @@
 package org.LPbigFish.Components;
 
+import org.LPbigFish.Security.Hasher;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -8,12 +10,11 @@ import java.util.concurrent.Future;
 
 public class Blockchain {
 
-    private static long difficulty = 4;
-
+    private static String difficulty = "0001000000000000000000000000000000000000000000000000000000000000";
     private final List<Block> chain = new ArrayList<>();
 
     public Blockchain() {
-        addBlock(new Block(0, System.currentTimeMillis(), "0000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000000000", "0", 0, 0, 60));
+        addBlock(new Block(0, System.currentTimeMillis(), "0000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000000000", "0", 0, "0", 60));
     }
 
     public Block getLatestBlock() {
@@ -24,7 +25,7 @@ public class Blockchain {
         chain.add(block);
         isValid();
         adjustDiff();
-
+        mine(new SubBlock(block.index() + 1, System.currentTimeMillis(), block.hash(), "0000000000000000000000000000000000000000000000000000000000000000", "0", 0));
     }
 
     public boolean isValid() {
@@ -42,7 +43,17 @@ public class Blockchain {
         if (chain.size() % 200 == 0) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 200);
-            difficulty = difficulty * (latestBlock.blockTime() / previousBlock.blockTime());
+
+            int zeros = 0;
+            String diff_compressed;
+            for (int i = difficulty.length(); i > 0; i--) {
+                if (difficulty.charAt(i - 1) == '0') {
+                    zeros++;
+                } else {
+                    diff_compressed = difficulty.substring(0, i - 1);
+                    break;
+                }
+            }
         }
     }
 
@@ -59,5 +70,7 @@ public class Blockchain {
         addBlock(newBlock);
     }
 
-
+    public void printTheChain() {
+        System.out.println(Hasher.jsonConverter(chain));
+    }
 }

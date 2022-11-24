@@ -1,5 +1,6 @@
 package org.LPbigFish.Security;
 
+import com.google.gson.Gson;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.MessageDigest;
@@ -7,6 +8,7 @@ import java.security.Security;
 
 public class Hasher {
 
+    private static final Gson gson = new Gson();
     public static void init() {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -51,4 +53,7 @@ public class Hasher {
         return bytes;
     }
 
+    public static String jsonConverter(Object object) {
+        return gson.toJson(object);
+    }
 }
