@@ -4,9 +4,9 @@ import org.LPbigFish.Security.Hasher;
 
 import java.util.Objects;
 
-public record Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String diff, long blockTime) {
+public record Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String target, long blockTime) {
 
-    public Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String diff, long blockTime) {
+    public Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String target, long blockTime) {
         this.index = Math.abs(index);
         this.timestamp = timestamp;
         if (previousHash.length() != 64) {
@@ -21,7 +21,7 @@ public record Block(long index, long timestamp, String previousHash, String hash
         }
         this.data = data;
         this.nonce = nonce;
-        this.diff = diff;
+        this.target = target;
         this.blockTime = blockTime;
     }
 
@@ -56,8 +56,8 @@ public record Block(long index, long timestamp, String previousHash, String hash
     }
 
     @Override
-    public String diff() {
-        return diff;
+    public String target() {
+        return target;
     }
 
     public boolean isValid() {
@@ -65,7 +65,7 @@ public record Block(long index, long timestamp, String previousHash, String hash
     }
 
     public String getBlockHash() {
-        return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak256(Hasher.toString(Hasher.toKeccak256(index + timestamp + previousHash + data)) + nonce)));
+        return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak256(Hasher.toString(Hasher.toKeccak256(timestamp + previousHash + data)) + nonce)));
     }
 
     public void printBlock() {
