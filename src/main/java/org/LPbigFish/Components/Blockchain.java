@@ -51,7 +51,8 @@ public class Blockchain {
             double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (20 * 60)) * 100.0) / 100.0;
             difficulty = difficulty.multiply(new BigDecimal(timeDiff));
 
-            System.out.println(timeDiff);
+            System.out.println("Difficulty was multiplied by: " + timeDiff);
+            adjustAvgNonce();
         }
     }
 
