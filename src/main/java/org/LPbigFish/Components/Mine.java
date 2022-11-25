@@ -2,23 +2,23 @@ package org.LPbigFish.Components;
 
 import org.LPbigFish.Security.Hasher;
 
-import java.util.Arrays;
-import java.util.concurrent.Callable;
+import java.math.BigInteger;
 
-public class Mine implements Callable<Block> {
+public class Mine {
     private SubBlock block;
-    private final String difficulty;
+    private final BigInteger difficulty;
 
-    public Mine(SubBlock block, String difficulty) {
+    public Mine(SubBlock block, BigInteger difficulty) {
         this.block = block;
         this.difficulty = difficulty;
     }
-    @Override
+
     public Block call() {
-        long timestamp = System.currentTimeMillis() * 1000;
-        while (!(Arrays.compare(Hasher.hashToByteArray(block.hash()), Hasher.hashToByteArray(difficulty)) >= 0)) {
+
+        while (new BigInteger(block.getBlockHash(), 16).compareTo(difficulty) >= 0) {
             block = new SubBlock(block.index(), block.timestamp(), block.previousHash(), block.hash(), block.data(), block.nonce() + 1);
         }
-        return new Block(block.index(), block.timestamp(), block.previousHash(), block.hash(), block.data(), block.nonce(), difficulty, block.timestamp() - timestamp);
+        long startTime = System.currentTimeMillis() / 1000L;
+        return new Block(block.index(), block.timestamp(), block.previousHash(), block.getBlockHash(), block.data(), block.nonce(), difficulty.toString(), startTime - block.timestamp());
     }
 }

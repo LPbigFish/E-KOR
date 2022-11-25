@@ -55,7 +55,7 @@ import java.util.Objects;
         }
 
         public String getBlockHash() {
-            return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak512(Hasher.toString(Hasher.toKeccak512(index + timestamp + previousHash + data)) + nonce)));
+            return Hasher.toString(Objects.requireNonNull(Hasher.toKeccak256(Hasher.toString(Hasher.doubleKeccak256(index + timestamp + previousHash + data)) + nonce)));
         }
 
     }

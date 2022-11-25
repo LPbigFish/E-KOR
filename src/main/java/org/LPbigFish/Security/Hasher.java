@@ -13,9 +13,9 @@ public class Hasher {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static byte[] toKeccak512(String input) {
+    public static byte[] toKeccak256(String input) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA3-512", "BC");
+            MessageDigest digest = MessageDigest.getInstance("SHA3-256", "BC");
             digest.update(input.getBytes());
             return digest.digest();
         } catch (Exception e) {
@@ -23,9 +23,9 @@ public class Hasher {
         }
     }
 
-    public static byte[] doubleKeccak512(String input) {
+    public static byte[] doubleKeccak256(String input) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA3-512", "BC");
+            MessageDigest md = MessageDigest.getInstance("SHA3-256", "BC");
             md.update(input.getBytes());
             byte[] digest = md.digest();
             md.update(digest);

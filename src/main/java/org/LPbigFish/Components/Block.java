@@ -65,11 +65,11 @@ public record Block(long index, long timestamp, String previousHash, String hash
     }
 
     public String getBlockHash() {
-        return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak512(Hasher.toString(Hasher.toKeccak512(index + timestamp + previousHash + data)) + nonce)));
+        return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak256(Hasher.toString(Hasher.toKeccak256(index + timestamp + previousHash + data)) + nonce)));
     }
 
     public void printBlock() {
-
+        System.out.println(Hasher.jsonConverter(this));
     }
 
 }

@@ -2,19 +2,18 @@ package org.LPbigFish.Components;
 
 import org.LPbigFish.Security.Hasher;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class Blockchain {
 
-    private static String difficulty = "0001000000000000000000000000000000000000000000000000000000000000";
+    private static BigInteger difficulty = new BigInteger("0001F30000000000000000000000000000000000000000000000000000000000", 16);
     private final List<Block> chain = new ArrayList<>();
 
     public Blockchain() {
-        addBlock(new Block(0, System.currentTimeMillis(), "0000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000000000", "0", 0, "0", 60));
+        addBlock(new Block(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000000000", "0", 0, "0", 60));
     }
 
     public Block getLatestBlock() {
@@ -22,10 +21,11 @@ public class Blockchain {
     }
 
     public void addBlock(Block block) {
+        block.printBlock();
         chain.add(block);
         isValid();
         adjustDiff();
-        mine(new SubBlock(block.index() + 1, System.currentTimeMillis(), block.hash(), "0000000000000000000000000000000000000000000000000000000000000000", "0", 0));
+        mine(new SubBlock(block.index() + 1, System.currentTimeMillis() / 1000L, block.hash(), "0000000000000000000000000000000000000000000000000000000000000000", "0", 0));
     }
 
     public boolean isValid() {
@@ -40,30 +40,23 @@ public class Blockchain {
     }
 
     private void adjustDiff() {
-        if (chain.size() % 200 == 0) {
+        if (chain.size() % 20 == 0) {
             Block latestBlock = getLatestBlock();
-            Block previousBlock = chain.get(chain.size() - 200);
+            Block previousBlock = chain.get(chain.size() - 20);
 
-            int zeros = 0;
-            String diff_compressed;
-            for (int i = difficulty.length(); i > 0; i--) {
-                if (difficulty.charAt(i - 1) == '0') {
-                    zeros++;
-                } else {
-                    diff_compressed = difficulty.substring(0, i - 1);
-                    break;
-                }
-            }
+            double timeDiff = (latestBlock.timestamp() - previousBlock.timestamp()) / (20 * 60);
+            difficulty = difficulty.multiply(new BigDecimal(timeDiff).toBigInteger());
+
+            System.out.println(difficulty);
         }
     }
 
     private void mine(SubBlock block) {
         Block newBlock = null;
         Mine mine = new Mine(block, difficulty);
-        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        Future<Block> futureBlock = pool.submit(mine);
+
         try {
-            newBlock = futureBlock.get();
+            newBlock = mine.call();
         } catch (Exception e) {
             e.printStackTrace();
         }
