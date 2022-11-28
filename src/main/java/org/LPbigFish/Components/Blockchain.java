@@ -12,12 +12,12 @@ import java.util.concurrent.Future;
 
 public class Blockchain {
 
-    private static BigDecimal difficulty = new BigDecimal(new BigInteger("27eb851eb851ec000000000000000000000000000000000000000000000", 16));
+    private static BigDecimal difficulty = new BigDecimal(new BigInteger("27eb851eb851ec0000000000000000000000000000000000000000000000", 16));
     private static long avgNonce = 20000000L;
     private final List<Block> chain = new ArrayList<>();
 
     public Blockchain() {
-        addBlock(new Block(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000000000", "0", 0, difficulty.toBigInteger().toString(), 60));
+        mine(new SubBlock(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0", "Genesis Block", 0));
     }
 
     public Block getLatestBlock() {
