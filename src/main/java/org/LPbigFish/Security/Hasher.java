@@ -72,7 +72,7 @@ public class Hasher {
 
 
 
-    public static String createAddress(String publicKey) {
+    /*public static String createAddress(String publicKey) {
         String publicKeyHash = toString(toKeccak256(publicKey));
         publicKeyHash = toString(toRIPEMD160(publicKeyHash));
 
@@ -82,8 +82,12 @@ public class Hasher {
         checksum = checksum.substring(0, 8);
         address += checksum;
 
-        return encodeBase58(address);
+        return encodeBase58(address.getBytes(StandardCharsets.UTF_8));
     }
 
+    public static String encodeBase58(String input) {
+    //https://youtu.be/GedV3S9X89c
+        return null;
+    }*/
 
 }

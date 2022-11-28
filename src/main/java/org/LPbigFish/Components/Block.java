@@ -65,7 +65,7 @@ public record Block(long index, long timestamp, String previousHash, String hash
     }
 
     public String getBlockHash() {
-        return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak256(Hasher.toString(Hasher.toKeccak256(timestamp + previousHash + data)) + nonce)));
+        return Hasher.toString(Objects.requireNonNull(Hasher.doubleKeccak256(Hasher.toString(Hasher.toKeccak256(previousHash + data)) + nonce)));
     }
 
     public void printBlock() {

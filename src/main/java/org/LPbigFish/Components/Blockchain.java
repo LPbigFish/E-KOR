@@ -4,6 +4,7 @@ import org.LPbigFish.Security.Hasher;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -16,6 +17,8 @@ public class Blockchain {
     private static long avgNonce = 20000000L;
     private final List<Block> chain = new ArrayList<>();
 
+
+
     public Blockchain() {
         mine(new SubBlock(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0", "Genesis Block", 0));
     }
@@ -27,8 +30,8 @@ public class Blockchain {
     public void addBlock(Block block) {
         block.printBlock();
         chain.add(block);
-        isValid();
         adjustDiff();
+        System.out.println("Work Value: " + getWorkValue()); //73967685 na indexu 10
         mine(new SubBlock(block.index() + 1, System.currentTimeMillis() / 1000L, block.hash(), "0000000000000000000000000000000000000000000000000000000000000000", "0", 0));
     }
 
@@ -48,7 +51,7 @@ public class Blockchain {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 20);
 
-            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (20 * 60)) * 100.0) / 100.0;
+            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (20 * 20)) * 100.0) / 100.0;
             difficulty = difficulty.multiply(new BigDecimal(timeDiff));
 
             System.out.println("Difficulty was multiplied by: " + timeDiff);
@@ -63,8 +66,8 @@ public class Blockchain {
                 nonces[i] = chain.get(chain.size() - 20 + i).nonce();
             }
             long sum = 0;
-            for (int i = 0; i < nonces.length; i++) {
-                sum += nonces[i];
+            for (Long nonce : nonces) {
+                sum += nonce;
             }
 
             avgNonce = Math.round(sum / nonces.length);
@@ -73,12 +76,13 @@ public class Blockchain {
 
     private void mine(SubBlock block) {
         Block newBlock = null;
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+        int cores = Runtime.getRuntime().availableProcessors() - 2;
+        ExecutorService executor = Executors.newFixedThreadPool(cores);
         List<Future<Block>> futures = new ArrayList<>();
-        long startNonce = Math.round(avgNonce / Runtime.getRuntime().availableProcessors() - 1);
-        for (int i = 0; i < Runtime.getRuntime().availableProcessors() - 1; i++) {
-            Mine mine = null;
-            if (i == Runtime.getRuntime().availableProcessors() - 2) {
+        long startNonce = Math.round(avgNonce / cores);
+        for (int i = 0; i < cores; i++) {
+            Mine mine;
+            if (i == cores - 1) {
                 mine = new Mine(block, difficulty.toBigInteger(), i * startNonce, Long.MAX_VALUE);
             } else {
                 mine = new Mine(block, difficulty.toBigInteger(), i * startNonce, (i + 1) * startNonce);
@@ -102,6 +106,17 @@ public class Blockchain {
         }
         executor.shutdown();
         addBlock(newBlock);
+    }
+
+    public BigInteger getWorkValue() {
+        BigDecimal work = new BigDecimal(new BigInteger("0"));
+        BigInteger maxHash = new BigInteger("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+        for (Block block: chain) {
+            BigInteger target = new BigInteger(block.target()).add(BigInteger.ONE);
+            work = work.add(new BigDecimal(maxHash).divide(new BigDecimal(target), RoundingMode.HALF_UP));
+        }
+
+        return work.toBigInteger();
     }
 
     public void printTheChain() {

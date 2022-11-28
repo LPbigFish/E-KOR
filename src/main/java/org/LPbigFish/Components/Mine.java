@@ -1,14 +1,11 @@
 package org.LPbigFish.Components;
 
-import org.LPbigFish.Security.Hasher;
-
 import java.math.BigInteger;
 import java.util.concurrent.Callable;
 
 public class Mine implements Callable<Block> {
     private SubBlock block;
 
-    private Block newBlock;
     private final BigInteger difficulty;
     private final long startNonce;
     private final long endNonce;
@@ -30,7 +27,6 @@ public class Mine implements Callable<Block> {
             }
         }
         long startTime = System.currentTimeMillis() / 1000L;
-        newBlock = new Block(block.index(), block.timestamp(), block.previousHash(), block.getBlockHash(), block.data(), block.nonce(), difficulty.toString(), startTime - block.timestamp());
-        return newBlock;
+        return new Block(block.index(), System.currentTimeMillis() / 1000L, block.previousHash(), block.getBlockHash(), block.data(), block.nonce(), difficulty.toString(), startTime - block.timestamp());
     }
 }
