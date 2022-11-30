@@ -6,12 +6,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Hasher {
 
     private static final Gson gson = new Gson();
 
-    private static final char[] base58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
     public static void init() {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -45,9 +46,8 @@ public class Hasher {
             md.update(input.getBytes());
             return md.digest();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     public static String toString(byte[] input) {
@@ -72,8 +72,8 @@ public class Hasher {
 
 
 
-    /*public static String createAddress(String publicKey) {
-        String publicKeyHash = toString(toKeccak256(publicKey));
+    public static String createAddress(String publicKey) {
+        String publicKeyHash = toString(doubleKeccak256(publicKey));
         publicKeyHash = toString(toRIPEMD160(publicKeyHash));
 
         String address = "00" + publicKeyHash;
@@ -82,12 +82,6 @@ public class Hasher {
         checksum = checksum.substring(0, 8);
         address += checksum;
 
-        return encodeBase58(address.getBytes(StandardCharsets.UTF_8));
+        return Converter.encodeBase58(address);
     }
-
-    public static String encodeBase58(String input) {
-    //https://youtu.be/GedV3S9X89c
-        return null;
-    }*/
-
 }
