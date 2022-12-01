@@ -80,7 +80,7 @@ public class Blockchain {
         ExecutorService executor = Executors.newFixedThreadPool(cores);
         List<Future<Block>> futures = new ArrayList<>();
         long startNonce = Math.round(avgNonce / cores);
-        for (int i = 0; i < cores; i++) {
+        /*for (int i = 0; i < cores; i++) {
             Mine mine;
             if (i == cores - 1) {
                 mine = new Mine(block, difficulty.toBigInteger(), i * startNonce, Long.MAX_VALUE);
@@ -88,8 +88,9 @@ public class Blockchain {
                 mine = new Mine(block, difficulty.toBigInteger(), i * startNonce, (i + 1) * startNonce);
             }
             futures.add(executor.submit(mine));
-        }
+        }*/
 
+        futures.add(executor.submit(new Mine(block, difficulty.toBigInteger(), 0, Long.MAX_VALUE)));
         while (newBlock == null) {
             for (Future<Block> future : futures) {
                 if (future.isDone()) {
@@ -104,7 +105,9 @@ public class Blockchain {
         for (Future<Block> future : futures) {
             future.cancel(true);
         }
+
         executor.shutdown();
+
         addBlock(newBlock);
     }
 

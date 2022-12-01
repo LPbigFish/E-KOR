@@ -6,7 +6,7 @@ public class Converter {
 
     private static final char[] base58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
 
-    public static String encodeBase58(String input) {
+    public static String encode58Base(String input) {
         //https://youtu.be/GedV3S9X89c
 
         byte[] inputBytes = input.getBytes(StandardCharsets.US_ASCII);
@@ -32,7 +32,7 @@ public class Converter {
 
         StringBuilder output = new StringBuilder();
         for (byte b : base) {
-            output.insert(0, base58[b]);
+            output.append(base58[b]);
         }
 
         return output.toString();

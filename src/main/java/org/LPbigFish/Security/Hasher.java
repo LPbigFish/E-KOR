@@ -82,6 +82,6 @@ public class Hasher {
         checksum = checksum.substring(0, 8);
         address += checksum;
 
-        return Converter.encodeBase58(address);
+        return Converter.encode58Base(address);
     }
 }

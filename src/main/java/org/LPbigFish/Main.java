@@ -11,6 +11,6 @@ public class Main {
         Random r = new Random();
         Hasher.init();
 
-        System.out.println(Converter.encodeBase58("Cat"));
+        Blockchain blockchain = new Blockchain();
     }
 }
