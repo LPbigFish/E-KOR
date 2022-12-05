@@ -47,7 +47,7 @@ public class Blockchain {
     }
 
     private void adjustDiff() {
-        if (chain.size() % 20 == 0) {
+        /*if (chain.size() % 20 == 0) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 20);
 
@@ -56,7 +56,16 @@ public class Blockchain {
 
             System.out.println("Difficulty was multiplied by: " + timeDiff);
             adjustAvgNonce();
-        }
+        }*/
+
+        Block latestBlock = getLatestBlock();
+        Block previousBlock = chain.get(chain.size() - 1);
+        BigInteger previousDiff = new BigInteger(previousBlock.target());
+        previousDiff = previousDiff.divide(BigInteger.valueOf(2048));
+        previousDiff = previousDiff.multiply(BigInteger.valueOf(Long.max((1 - Math.round(latestBlock.timestamp() - previousBlock.timestamp()) / 10), -99)));
+        previousDiff = previousDiff.add(new BigInteger(previousBlock.target()));
+        previousDiff = previousDiff.add(BigInteger.valueOf(2^(Math.round(latestBlock.index() / 100000d) - 2)));
+        difficulty = new BigDecimal(previousDiff);
     }
 
     private void adjustAvgNonce() {
@@ -70,7 +79,7 @@ public class Blockchain {
                 sum += nonce;
             }
 
-            avgNonce = Math.round(sum / nonces.length);
+            avgNonce = Math.round(sum / (double) nonces.length);
         }
     }
 
@@ -79,7 +88,7 @@ public class Blockchain {
         int cores = Runtime.getRuntime().availableProcessors() - 2;
         ExecutorService executor = Executors.newFixedThreadPool(cores);
         List<Future<Block>> futures = new ArrayList<>();
-        long startNonce = Math.round(avgNonce / cores);
+        long startNonce = Math.round(avgNonce / (double) cores);
         /*for (int i = 0; i < cores; i++) {
             Mine mine;
             if (i == cores - 1) {

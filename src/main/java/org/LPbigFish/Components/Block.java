@@ -4,9 +4,9 @@ import org.LPbigFish.Security.Hasher;
 
 import java.util.Objects;
 
-public record Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String target, long blockTime) {
+public record Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String target, double blockTime) {
 
-    public Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String target, long blockTime) {
+    public Block(long index, long timestamp, String previousHash, String hash, String data, long nonce, String target, double blockTime) {
         this.index = Math.abs(index);
         this.timestamp = timestamp;
         if (previousHash.length() != 64) {
