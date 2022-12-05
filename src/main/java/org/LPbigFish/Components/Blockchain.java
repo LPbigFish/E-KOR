@@ -27,7 +27,7 @@ public class Blockchain {
         return chain.get(chain.size() - 1);
     }
 
-    public void addBlock(Block block) {
+    private void addBlock(Block block) {
         block.printBlock();
         chain.add(block);
         adjustDiff();
@@ -57,15 +57,16 @@ public class Blockchain {
             System.out.println("Difficulty was multiplied by: " + timeDiff);
             adjustAvgNonce();
         }*/
-
-        Block latestBlock = getLatestBlock();
-        Block previousBlock = chain.get(chain.size() - 1);
-        BigInteger previousDiff = new BigInteger(previousBlock.target());
-        previousDiff = previousDiff.divide(BigInteger.valueOf(2048));
-        previousDiff = previousDiff.multiply(BigInteger.valueOf(Long.max((1 - Math.round(latestBlock.timestamp() - previousBlock.timestamp()) / 10), -99)));
-        previousDiff = previousDiff.add(new BigInteger(previousBlock.target()));
-        previousDiff = previousDiff.add(BigInteger.valueOf(2^(Math.round(latestBlock.index() / 100000d) - 2)));
-        difficulty = new BigDecimal(previousDiff);
+        if (chain.size() > 1) {
+            Block latestBlock = getLatestBlock();
+            Block previousBlock = chain.get(chain.size() - 2);
+            BigInteger previousDiff = new BigInteger(previousBlock.target());
+            previousDiff = previousDiff.divide(BigInteger.valueOf(2048));
+            previousDiff = previousDiff.multiply(BigInteger.valueOf(Long.max((1 - Math.round(latestBlock.timestamp() - previousBlock.timestamp()) / 10), -99)));
+            previousDiff = previousDiff.add(new BigInteger(previousBlock.target()));
+            previousDiff = previousDiff.add(BigInteger.valueOf(Math.round(Math.pow(2, Math.floor(latestBlock.index() / 100000d) - 2))));
+            difficulty = new BigDecimal(previousDiff);
+        }
     }
 
     private void adjustAvgNonce() {
@@ -116,6 +117,8 @@ public class Blockchain {
         }
 
         executor.shutdown();
+        if(chain.size() != 0)
+            newBlock = new Block(newBlock.index(), newBlock.timestamp(), newBlock.previousHash(), newBlock.hash(), newBlock.data(), newBlock.nonce(), newBlock.target(), newBlock.timestamp() - getLatestBlock().timestamp());
 
         addBlock(newBlock);
     }

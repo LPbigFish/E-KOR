@@ -1,7 +1,6 @@
 package org.LPbigFish;
 
 import org.LPbigFish.Components.Blockchain;
-import org.LPbigFish.Security.Converter;
 import org.LPbigFish.Security.Hasher;
 
 import java.util.Random;

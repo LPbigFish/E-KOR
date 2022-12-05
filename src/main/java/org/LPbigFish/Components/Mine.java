@@ -27,6 +27,6 @@ public class Mine implements Callable<Block> {
             }
         }
         long startTime = System.currentTimeMillis() / 1000L;
-        return new Block(block.index(), System.currentTimeMillis() / 1000L, block.previousHash(), block.getBlockHash(), block.data(), block.nonce(), difficulty.toString(), startTime - block.timestamp());
+        return new Block(block.index(), System.currentTimeMillis() / 1000L, block.previousHash(), block.getBlockHash(), block.data(), block.nonce(), difficulty.toString(),startTime - block.timestamp());
     }
 }
