@@ -26,6 +26,12 @@
             <artifactId>gson</artifactId>
             <version>2.10</version>
         </dependency>
+        <dependency>
+            <groupId>com.starkbank.ellipticcurve</groupId>
+            <artifactId>starkbank-ecdsa</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>

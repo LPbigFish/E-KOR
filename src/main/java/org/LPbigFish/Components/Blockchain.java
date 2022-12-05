@@ -20,7 +20,8 @@ public class Blockchain {
 
 
     public Blockchain() {
-        mine(new SubBlock(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0", "Genesis Block", 0));
+        addBlock(mine(new SubBlock(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0", "Genesis Block", 0)));
+        run();
     }
 
     public Block getLatestBlock() {
@@ -32,7 +33,13 @@ public class Blockchain {
         chain.add(block);
         adjustDiff();
         System.out.println("Work Value: " + getWorkValue()); //73967685 na indexu 10
-        mine(new SubBlock(block.index() + 1, System.currentTimeMillis() / 1000L, block.hash(), "0000000000000000000000000000000000000000000000000000000000000000", "0", 0));
+    }
+
+    public void run() {
+        while (true) {
+            addBlock(mine(new SubBlock(getLatestBlock().index() + 1, System.currentTimeMillis() / 1000L, getLatestBlock().hash(), "0000000000000000000000000000000000000000000000000000000000000000", "0", 0)));
+        }
+
     }
 
     public boolean isValid() {
@@ -47,26 +54,26 @@ public class Blockchain {
     }
 
     private void adjustDiff() {
-        /*if (chain.size() % 20 == 0) {
+        if (chain.size() % 20 == 0) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 20);
 
-            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (20 * 20)) * 100.0) / 100.0;
+            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (300 * 20)) * 100.0) / 100.0;
             difficulty = difficulty.multiply(new BigDecimal(timeDiff));
 
             System.out.println("Difficulty was multiplied by: " + timeDiff);
             adjustAvgNonce();
-        }*/
-        if (chain.size() > 1) {
+        }
+        /*if (chain.size() > 1) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 2);
             BigInteger previousDiff = new BigInteger(previousBlock.target());
             previousDiff = previousDiff.divide(BigInteger.valueOf(2048));
-            previousDiff = previousDiff.multiply(BigInteger.valueOf(Long.max((1 - Math.round(latestBlock.timestamp() - previousBlock.timestamp()) / 10), -99)));
+            previousDiff = previousDiff.multiply(BigInteger.valueOf(Long.max((1 - Math.round(Math.floor(latestBlock.timestamp() - previousBlock.timestamp()) / 10)), -99)));
             previousDiff = previousDiff.add(new BigInteger(previousBlock.target()));
             previousDiff = previousDiff.add(BigInteger.valueOf(Math.round(Math.pow(2, Math.floor(latestBlock.index() / 100000d) - 2))));
             difficulty = new BigDecimal(previousDiff);
-        }
+        }*/
     }
 
     private void adjustAvgNonce() {
@@ -84,7 +91,7 @@ public class Blockchain {
         }
     }
 
-    private void mine(SubBlock block) {
+    private Block mine(SubBlock block) {
         Block newBlock = null;
         int cores = Runtime.getRuntime().availableProcessors() - 2;
         ExecutorService executor = Executors.newFixedThreadPool(cores);
@@ -119,8 +126,7 @@ public class Blockchain {
         executor.shutdown();
         if(chain.size() != 0)
             newBlock = new Block(newBlock.index(), newBlock.timestamp(), newBlock.previousHash(), newBlock.hash(), newBlock.data(), newBlock.nonce(), newBlock.target(), newBlock.timestamp() - getLatestBlock().timestamp());
-
-        addBlock(newBlock);
+        return newBlock;
     }
 
     public BigInteger getWorkValue() {
