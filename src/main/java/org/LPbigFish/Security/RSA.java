@@ -27,11 +27,11 @@ public class RSA {
         return Ecdsa.verify(message, Signature.fromBase64(signature), PublicKey.fromPem(publicKey));
     }
 
-    public static String ConvertByteStringToBase64(ByteString byteString) {
+    public static String convertByteStringToBase64(ByteString byteString) {
         return byteString.toString();
     }
 
-    public static ByteString ConvertBase64ToByteString(String base64) {
+    public static ByteString convertBase64ToByteString(String base64) {
         return new ByteString(base64.getBytes());
     }
 

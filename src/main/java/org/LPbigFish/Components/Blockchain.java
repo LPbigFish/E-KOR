@@ -12,14 +12,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class Blockchain {
+    private static long difficulty = 500000;
+    private static BigDecimal target = new BigDecimal(new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16));
 
-    private static BigDecimal difficulty = new BigDecimal(new BigInteger("27eb851eb851ec0000000000000000000000000000000000000000000000", 16));
+    private static final BigInteger TARGET_MAX = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16);
     private static long avgNonce = 20000000L;
     private final List<Block> chain = new ArrayList<>();
 
 
 
     public Blockchain() {
+        target = target.divide(new BigDecimal(difficulty), 0, RoundingMode.HALF_UP);
         addBlock(mine(new SubBlock(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0", "Genesis Block", 0)));
         run();
     }
@@ -37,7 +40,7 @@ public class Blockchain {
 
     public void run() {
         while (true) {
-            addBlock(mine(new SubBlock(getLatestBlock().index() + 1, System.currentTimeMillis() / 1000L, getLatestBlock().hash(), "0000000000000000000000000000000000000000000000000000000000000000", "0", 0)));
+            addBlock(mine(new SubBlock(getLatestBlock().index() + 1, System.currentTimeMillis() / 1000L, getLatestBlock().hash(), "0000000000000000000000000000000000000000000000000000000000000000", Math.random() + "", 0)));
         }
 
     }
@@ -59,8 +62,8 @@ public class Blockchain {
             Block previousBlock = chain.get(chain.size() - 20);
 
             double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (300 * 20)) * 100.0) / 100.0;
-            difficulty = difficulty.multiply(new BigDecimal(timeDiff));
-
+            difficulty /= timeDiff;
+            target = new BigDecimal(TARGET_MAX.divide(BigInteger.valueOf(difficulty)));
             System.out.println("Difficulty was multiplied by: " + timeDiff);
             adjustAvgNonce();
         }
@@ -107,7 +110,7 @@ public class Blockchain {
             futures.add(executor.submit(mine));
         }*/
 
-        futures.add(executor.submit(new Mine(block, difficulty.toBigInteger(), 0, Long.MAX_VALUE)));
+        futures.add(executor.submit(new Mine(block, target.toBigInteger(), 0, Long.MAX_VALUE)));
         while (newBlock == null) {
             for (Future<Block> future : futures) {
                 if (future.isDone()) {
