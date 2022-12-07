@@ -57,7 +57,7 @@ public class Blockchain {
     }
 
     private void adjustDiff() {
-        if (chain.size() % 20 == 0) {
+        /*if (chain.size() % 20 == 0) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 20);
 
@@ -66,17 +66,15 @@ public class Blockchain {
             target = new BigDecimal(TARGET_MAX.divide(BigInteger.valueOf(difficulty)));
             System.out.println("Difficulty was multiplied by: " + timeDiff);
             adjustAvgNonce();
-        }
-        /*if (chain.size() > 1) {
+        }*/
+         if (chain.size() > 1) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 2);
-            BigInteger previousDiff = new BigInteger(previousBlock.target());
-            previousDiff = previousDiff.divide(BigInteger.valueOf(2048));
-            previousDiff = previousDiff.multiply(BigInteger.valueOf(Long.max((1 - Math.round(Math.floor(latestBlock.timestamp() - previousBlock.timestamp()) / 10)), -99)));
-            previousDiff = previousDiff.add(new BigInteger(previousBlock.target()));
-            previousDiff = previousDiff.add(BigInteger.valueOf(Math.round(Math.pow(2, Math.floor(latestBlock.index() / 100000d) - 2))));
-            difficulty = new BigDecimal(previousDiff);
-        }*/
+            long prevDiff = TARGET_MAX.divide(new BigInteger(previousBlock.target())).longValue();
+
+            difficulty = (long) (prevDiff + Math.round(prevDiff / 2048d) * Math.max(1 - (Math.round((latestBlock.timestamp() - previousBlock.timestamp())) / 10), -99) + Math.floor(2 ^ Math.round(latestBlock.index() / 100000d) - 2));
+            target = new BigDecimal(TARGET_MAX.divide(BigInteger.valueOf(difficulty)));
+        }
     }
 
     private void adjustAvgNonce() {
