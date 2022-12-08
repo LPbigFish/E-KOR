@@ -57,24 +57,24 @@ public class Blockchain {
     }
 
     private void adjustDiff() {
-        /*if (chain.size() % 20 == 0) {
+        if (chain.size() % 20 == 0) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 20);
 
-            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (300 * 20)) * 100.0) / 100.0;
+            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (50 * 20)) * 100.0) / 100.0;
             difficulty /= timeDiff;
             target = new BigDecimal(TARGET_MAX.divide(BigInteger.valueOf(difficulty)));
             System.out.println("Difficulty was multiplied by: " + timeDiff);
             adjustAvgNonce();
-        }*/
-         if (chain.size() > 1) {
+        }
+         /*if (chain.size() > 1) {
             Block latestBlock = getLatestBlock();
             Block previousBlock = chain.get(chain.size() - 2);
             long prevDiff = TARGET_MAX.divide(new BigInteger(previousBlock.target())).longValue();
 
-            difficulty = (long) (prevDiff + Math.round(prevDiff / 2048d) * Math.max(1 - (Math.round((latestBlock.timestamp() - previousBlock.timestamp())) / 10), -99) + Math.floor(2 ^ Math.round(latestBlock.index() / 100000d) - 2));
+            difficulty = (long) (prevDiff + Math.round(prevDiff / 2048d) * Math.max(1 - (Math.round((latestBlock.timestamp() - previousBlock.timestamp())) / 20), -99) + Math.floor(2 ^ Math.round(latestBlock.index() / 100000d) - 2));
             target = new BigDecimal(TARGET_MAX.divide(BigInteger.valueOf(difficulty)));
-        }
+        }*/
     }
 
     private void adjustAvgNonce() {
@@ -134,8 +134,8 @@ public class Blockchain {
         BigDecimal work = new BigDecimal(new BigInteger("0"));
         BigInteger maxHash = new BigInteger("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
         for (Block block: chain) {
-            BigInteger target = new BigInteger(block.target()).add(BigInteger.ONE);
-            work = work.add(new BigDecimal(maxHash).divide(new BigDecimal(target), RoundingMode.HALF_UP));
+            BigInteger temp_target = (new BigInteger(block.target())).add(BigInteger.ONE);
+            work = work.add(new BigDecimal(maxHash).divide(new BigDecimal(temp_target), RoundingMode.HALF_UP));
         }
 
         return work.toBigInteger();
