@@ -50,6 +50,16 @@ public class Hasher {
         }
     }
 
+    public static byte[] toKeccak512(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA3-512", "BC");
+            digest.update(input.getBytes());
+            return digest.digest();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static String toString(byte[] input) {
         StringBuilder sb = new StringBuilder();
         for (byte b : input) {
