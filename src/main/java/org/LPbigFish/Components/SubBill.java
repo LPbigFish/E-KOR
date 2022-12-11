@@ -1,11 +1,14 @@
 package org.LPbigFish.Components;
 
-public record SubBill(String hash, String data, String Signature, String printerAddress) {
-    public SubBill(String hash, String data, String Signature, String printerAddress) {
+import org.LPbigFish.Security.Hasher;
+
+public record SubBill(String authorityHash, String data, String signature, long nonce, String printerAddress) {
+    public SubBill(String authorityHash, String data, String signature, long nonce, String printerAddress) {
         this.data = data;
-        this.Signature = Signature;
+        this.signature = signature;
         this.printerAddress = printerAddress;
-        this.hash = "";
+        this.authorityHash = authorityHash();
+        this.nonce = nonce;
     }
 
     @Override
@@ -14,12 +17,22 @@ public record SubBill(String hash, String data, String Signature, String printer
     }
 
     @Override
-    public String Signature() {
-        return Signature;
+    public String signature() {
+        return signature;
     }
 
     @Override
     public String printerAddress() {
         return printerAddress;
+    }
+
+    @Override
+    public long nonce() {
+        return nonce;
+    }
+
+    @Override
+    public String authorityHash() {
+        return Hasher.toString(Hasher.toKeccak512(Hasher.toString(Hasher.doubleKeccak256(data + signature + nonce)) + printerAddress));
     }
 }
