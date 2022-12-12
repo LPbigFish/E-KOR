@@ -1,9 +1,11 @@
 package org.LPbigFish.Components;
 
+import org.LPbigFish.Security.Hasher;
+
 public record Bill (String identifier, long timeStamp, String hash, String data, String signature, String printerAddress, String witnessKey, String witnessSignature) {
 
     public Bill(String identifier, long timeStamp, String hash, String data, String signature, String printerAddress, String witnessKey, String witnessSignature) {
-        this.identifier = identifier;
+
         this.timeStamp = timeStamp;
         this.hash = hash;
         this.data = data;
@@ -11,11 +13,12 @@ public record Bill (String identifier, long timeStamp, String hash, String data,
         this.printerAddress = printerAddress;
         this.witnessKey = witnessKey;
         this.witnessSignature = witnessSignature;
+        this.identifier = identifier();
     }
 
     @Override
     public String identifier() {
-        return identifier;
+        return Hasher.toString(Hasher.toKeccak512(witnessKey + Hasher.toString(Hasher.doubleKeccak256(timeStamp + hash + data + signature)) + printerAddress + witnessSignature));
     }
 
     @Override
