@@ -7,8 +7,8 @@ public record SubBill(String authorityHash, String data, String signature, long 
         this.data = data;
         this.signature = signature;
         this.printerAddress = printerAddress;
-        this.authorityHash = authorityHash();
         this.nonce = nonce;
+        this.authorityHash = authorityHash();
     }
 
     @Override

@@ -6,7 +6,6 @@ import java.util.concurrent.Callable;
 public class Print implements Callable<SubBill> {
 
     private SubBill bill;
-
     private final BigInteger target;
 
     public Print(SubBill bill, BigInteger target) {
