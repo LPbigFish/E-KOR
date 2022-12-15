@@ -5,6 +5,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,5 +104,10 @@ public class Hasher {
         address += checksum;
 
         return Converter.encode58Base(address);
+    }
+
+    public static int getSecureRandomInt(int min, int max) {
+        SecureRandom random = new SecureRandom();
+        return random.nextInt((max - min) + 1) + min;
     }
 }

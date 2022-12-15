@@ -13,9 +13,12 @@ public class Blockchain {
     private static long avgNonce = 20000000L;
     private final List<Block> chain = new ArrayList<>();
 
+    private static final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+
     public static boolean synced = true;
 
     public Blockchain() {
+        Hasher.init();
         Values.init();
         addBlock(mine(new SubBlock(0, System.currentTimeMillis() / 1000L, "0000000000000000000000000000000000000000000000000000000000000000", "0", "Genesis Block", 0)));
         run();
@@ -67,8 +70,7 @@ public class Blockchain {
 
     private Block mine(SubBlock block) {
         Block newBlock = null;
-        int cores = Runtime.getRuntime().availableProcessors() - 2;
-        ExecutorService executor = Executors.newFixedThreadPool(cores);
+        int cores = Runtime.getRuntime().availableProcessors() - 1;
         List<Future<Block>> futures = new ArrayList<>();
         //long startNonce = Math.round(avgNonce / (double) cores);
         /*for (int i = 0; i < cores; i++) {
