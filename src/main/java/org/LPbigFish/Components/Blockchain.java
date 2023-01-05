@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class Blockchain {
-    private static long avgNonce = 20000000L;
     private final List<Block> chain = new ArrayList<>();
 
+    public static Block blockBuffer = null;
     private static final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 
     public static boolean synced = true;
@@ -38,6 +38,10 @@ public class Blockchain {
     public void run() {
         while (synced) {
             addBlock(mine(new SubBlock(getLatestBlock().index() + 1, System.currentTimeMillis() / 1000L, getLatestBlock().hash(), "0000000000000000000000000000000000000000000000000000000000000000", Math.random() + "", 0)));
+            if (!isValid()) {
+                synced = false;
+                System.out.println("Blockchain is not valid! Please restart the program to resynchronise!");
+            }
         }
 
     }
@@ -64,7 +68,7 @@ public class Blockchain {
                 sum += nonce;
             }
 
-            avgNonce = Math.round(sum / (double) nonces.length);
+            long avgNonce = Math.round(sum / (double) nonces.length);
         }
     }
 
@@ -84,7 +88,7 @@ public class Blockchain {
         }*/
 
         futures.add(executor.submit(new Mine(block, Values.getTarget().toBigInteger().divide(BigInteger.valueOf(cores)), 0, Long.MAX_VALUE)));
-        while (newBlock == null) {
+        while (newBlock == null || blockBuffer != null) {
             for (Future<Block> future : futures) {
                 if (future.isDone()) {
                     try {
@@ -100,8 +104,13 @@ public class Blockchain {
         }
 
         executor.shutdown();
-        if(chain.size() != 0)
+        if(chain.size() != 0) {
             newBlock = new Block(newBlock.index(), newBlock.timestamp(), newBlock.previousHash(), newBlock.hash(), newBlock.data(), newBlock.nonce(), newBlock.target(), newBlock.timestamp() - getLatestBlock().timestamp());
+        }
+        if (blockBuffer != null) {
+            newBlock = blockBuffer;
+            blockBuffer = null;
+        }
         return newBlock;
     }
 
