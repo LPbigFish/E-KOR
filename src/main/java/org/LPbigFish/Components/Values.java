@@ -12,21 +12,35 @@ public class Values {
 
     private static long difficulty = 500000;
 
+    public static String[] known_Peers = { "10.50.58.46" };
+
+
+
+
     public static void init() {
         target = target.divide(new BigDecimal(difficulty), 0, RoundingMode.HALF_UP);
     }
 
     public static void adjustDiff(List<Block> chain) {
-        if (chain.size() % 20 == 0) {
+        if (chain.size() % 10 == 0) {
             Block latestBlock = chain.get(chain.size() - 1);
-            Block previousBlock = chain.get(chain.size() - 20);
+            Block previousBlock = chain.get(chain.size() - 10);
+            long time = latestBlock.timestamp() - previousBlock.timestamp();
+            if (time > 10 * 40) {
+                difficulty *= 0.8;
+                System.out.println("Difficulty was multiplied by: " + 1.2 + "because of big downfall of time");
+            }
+        }
+        if (chain.size() % 1024 == 0) {
+            Block latestBlock = chain.get(chain.size() - 1);
+            Block previousBlock = chain.get(chain.size() - 1024);
 
-            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (50 * 20)) * 100.0) / 100.0;
+            double timeDiff = Math.round(((double) (latestBlock.timestamp() - previousBlock.timestamp()) / (40 * 1024)) * 100.0) / 100.0;
             if (timeDiff > 8)
                 difficulty /= 8;
             else difficulty /= Math.max(timeDiff, 0.01);
             target = new BigDecimal(TARGET_MAX.divide(BigInteger.valueOf(difficulty)));
-            System.out.println("Difficulty was multiplied by: " + timeDiff);
+
         }
          /*if (chain.size() > 1) {
             Block latestBlock = getLatestBlock();
